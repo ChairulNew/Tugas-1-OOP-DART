@@ -1,3 +1,5 @@
+import 'dart:io';
+
 // Model untuk Pengguna
 class User {
   String username;
@@ -63,26 +65,51 @@ class Comment {
 // Sistem Utama (Simulasi Instagram)
 void main() {
   // Buat pengguna
-  User user1 = User('Chairul Arul', 'Tech enthusiast & coder.');
-  User user2 = User('Renanta Namoura', 'Love photography and design.');
+  User user1 = User('john_doe', 'Tech enthusiast & coder.');
+  User user2 = User('jane_doe', 'Love photography and design.');
 
-  // Buat postingan
-  Post post1 = Post('Coding with me', 'Senja yang indah di pantai.');
-  Post post2 = Post('Sunset yang indah', 'Meja kerja impian!');
+  while (true) {
+    print('\nPilih aksi:');
+    print('1. Tambah Postingan');
+    print('2. Like Postingan');
+    print('3. Cek Status Pengguna');
+    print('4. Keluar');
 
-  // Tambahkan postingan ke pengguna
-  user1.addPost(post1);
-  user2.addPost(post2);
+    String? pilihan = stdin.readLineSync();
+    if (pilihan == '1') {
+      print('Masukkan deskripsi postingan:');
+      String? caption = stdin.readLineSync();
+      print('Masukkan konten postingan:');
+      String? content = stdin.readLineSync();
 
-  // Interaksi dengan postingan
-  user1.likePost(post1);
-  user2.likePost(post1);
-  user2.likePost(post1); // Tes double like
-
-  post1.addComment(Comment('jane_doe', 'Wow, keren banget!'));
-  post2.addComment(Comment('john_doe', 'Meja kerja yang rapi!'));
-
-  // Cek status pengguna
-  user1.checkStatus();
-  user2.checkStatus();
+      if (caption != null && content != null) {
+        Post newPost = Post(content, caption);
+        user1.addPost(newPost);
+      }
+    } else if (pilihan == '2') {
+      if (user1.posts.isNotEmpty) {
+        print('Pilih postingan untuk di-like:');
+        for (var i = 0; i < user1.posts.length; i++) {
+          print('${i + 1}. ${user1.posts[i].caption}');
+        }
+        String? indexInput = stdin.readLineSync();
+        int? index = int.tryParse(indexInput ?? '');
+        if (index != null && index > 0 && index <= user1.posts.length) {
+          user2.likePost(user1.posts[index - 1]);
+        } else {
+          print('Pilihan tidak valid.');
+        }
+      } else {
+        print('Belum ada postingan untuk di-like.');
+      }
+    } else if (pilihan == '3') {
+      user1.checkStatus();
+      user2.checkStatus();
+    } else if (pilihan == '4') {
+      print('Terima kasih telah menggunakan Instagram Simulasi!');
+      break;
+    } else {
+      print('Pilihan tidak valid. Silakan coba lagi.');
+    }
+  }
 }
