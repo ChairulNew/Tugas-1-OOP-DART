@@ -3,12 +3,30 @@ class User {
   String username;
   String bio;
   List<Post> posts = [];
+  List<Post> likedPosts = [];
 
   User(this.username, this.bio);
 
   void addPost(Post post) {
     posts.add(post);
-    print('$username menambahkan postingan baru.');
+    print('$username menambahkan postingan baru: "${post.caption}".');
+  }
+
+  void likePost(Post post) {
+    if (!likedPosts.contains(post)) {
+      likedPosts.add(post);
+      post.likePost();
+      print('$username menyukai postingan: "${post.caption}"');
+    } else {
+      print('$username sudah menyukai postingan ini sebelumnya.');
+    }
+  }
+
+  void checkStatus() {
+    print('Profil: $username | Bio: $bio');
+    print(
+      'Postingan: ${posts.length} | Postingan yang disukai: ${likedPosts.length}',
+    );
   }
 }
 
@@ -23,12 +41,14 @@ class Post {
 
   void addComment(Comment comment) {
     comments.add(comment);
-    print('Komentar baru ditambahkan: ${comment.text}');
+    print(
+      'Komentar baru ditambahkan oleh ${comment.username}: "${comment.text}"',
+    );
   }
 
   void likePost() {
     likes++;
-    print('Postingan mendapat $likes like(s)');
+    print('Postingan "$caption" mendapat $likes like(s)');
   }
 }
 
@@ -43,21 +63,26 @@ class Comment {
 // Sistem Utama (Simulasi Instagram)
 void main() {
   // Buat pengguna
-  User user1 = User('john_doe', 'Tech enthusiast & coder.');
-  User user2 = User('jane_doe', 'Love photography and design.');
+  User user1 = User('Chairul Arul', 'Tech enthusiast & coder.');
+  User user2 = User('Renanta Namoura', 'Love photography and design.');
 
   // Buat postingan
-  Post post1 = Post('Foto Sunset', 'Senja yang indah di pantai.');
-  Post post2 = Post('Coding Setup', 'Meja kerja impian!');
+  Post post1 = Post('Coding with me', 'Senja yang indah di pantai.');
+  Post post2 = Post('Sunset yang indah', 'Meja kerja impian!');
 
   // Tambahkan postingan ke pengguna
   user1.addPost(post1);
   user2.addPost(post2);
 
   // Interaksi dengan postingan
-  post1.likePost();
-  post1.addComment(Comment('jane_doe', 'Wow, keren banget!'));
+  user1.likePost(post1);
+  user2.likePost(post1);
+  user2.likePost(post1); // Tes double like
 
-  post2.likePost();
+  post1.addComment(Comment('jane_doe', 'Wow, keren banget!'));
   post2.addComment(Comment('john_doe', 'Meja kerja yang rapi!'));
+
+  // Cek status pengguna
+  user1.checkStatus();
+  user2.checkStatus();
 }
