@@ -64,16 +64,64 @@ class Comment {
 
 // Sistem Utama (Simulasi Instagram)
 void main() {
-  // Buat pengguna
-  User user1 = User('john_doe', 'Tech enthusiast & coder.');
-  User user2 = User('jane_doe', 'Love photography and design.');
+  List<User> users = [];
+  User? currentUser;
 
   while (true) {
+    print('\nPilih aksi:');
+    print('1. Login');
+    print('2. Register');
+    print('3. Keluar');
+
+    String? pilihan = stdin.readLineSync();
+    if (pilihan == '1') {
+      print('Masukkan username untuk login:');
+      String? username = stdin.readLineSync();
+
+      currentUser = users.firstWhere(
+        (user) => user.username == username,
+        orElse: () => User('', ''),
+      );
+
+      if (currentUser.username == '') {
+        print('Username tidak ditemukan. Silakan coba lagi.');
+      } else {
+        print('Berhasil login sebagai $username');
+        break;
+      }
+    } else if (pilihan == '2') {
+      print('Masukkan username untuk register:');
+      String? username = stdin.readLineSync();
+
+      print('Masukkan bio Anda:');
+      String? bio = stdin.readLineSync();
+
+      User newUser = User(username ?? '', bio ?? '');
+      users.add(newUser);
+
+      print('Berhasil register sebagai $username');
+      currentUser = newUser;
+      break;
+    } else if (pilihan == '3') {
+      print('Terima kasih telah menggunakan Instagram Simulasi!');
+      break;
+    } else {
+      print('Pilihan tidak valid. Silakan coba lagi.');
+    }
+  }
+
+  while (true) {
+    if (currentUser == null) {
+      print('Anda harus login terlebih dahulu.');
+      break;
+    }
+
     print('\nPilih aksi:');
     print('1. Tambah Postingan');
     print('2. Like Postingan');
     print('3. Cek Status Pengguna');
-    print('4. Keluar');
+    print('4. Logout');
+    print('5. Keluar');
 
     String? pilihan = stdin.readLineSync();
     if (pilihan == '1') {
@@ -84,18 +132,26 @@ void main() {
 
       if (caption != null && content != null) {
         Post newPost = Post(content, caption);
-        user1.addPost(newPost);
+        currentUser.addPost(newPost);
       }
     } else if (pilihan == '2') {
-      if (user1.posts.isNotEmpty) {
+      if (currentUser.posts.isNotEmpty) {
         print('Pilih postingan untuk di-like:');
-        for (var i = 0; i < user1.posts.length; i++) {
-          print('${i + 1}. ${user1.posts[i].caption}');
+        for (var i = 0; i < currentUser.posts.length; i++) {
+          print('${i + 1}. ${currentUser.posts[i].caption}');
         }
         String? indexInput = stdin.readLineSync();
         int? index = int.tryParse(indexInput ?? '');
-        if (index != null && index > 0 && index <= user1.posts.length) {
-          user2.likePost(user1.posts[index - 1]);
+        if (index != null && index > 0 && index <= currentUser.posts.length) {
+          // Perbaiki ini dengan mengembalikan user lain jika ada
+          User otherUser = users.firstWhere(
+            (user) => user != currentUser,
+            orElse:
+                () =>
+                    users
+                        .first, // Mengembalikan user pertama yang valid jika tidak ada user lain
+          );
+          otherUser.likePost(currentUser.posts[index - 1]);
         } else {
           print('Pilihan tidak valid.');
         }
@@ -103,9 +159,12 @@ void main() {
         print('Belum ada postingan untuk di-like.');
       }
     } else if (pilihan == '3') {
-      user1.checkStatus();
-      user2.checkStatus();
+      currentUser.checkStatus();
     } else if (pilihan == '4') {
+      print('Logout berhasil.');
+      currentUser = null;
+      break;
+    } else if (pilihan == '5') {
       print('Terima kasih telah menggunakan Instagram Simulasi!');
       break;
     } else {
