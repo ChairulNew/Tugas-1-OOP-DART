@@ -1,110 +1,46 @@
 import 'dart:io';
+import 'models/user.dart';
+import 'models/admin.dart';
+import 'models/post.dart';
+import 'models/comment.dart';
 
-// Model untuk Pengguna
-class User {
-  String username;
-  String bio;
-  List<Post> posts = [];
-  List<Post> likedPosts = [];
-
-  User(this.username, this.bio);
-
-  void addPost(Post post) {
-    posts.add(post);
-    print('$username menambahkan postingan baru: "${post.caption}".');
-  }
-
-  void likePost(Post post) {
-    if (!likedPosts.contains(post)) {
-      likedPosts.add(post);
-      post.likePost();
-      print('$username menyukai postingan: "${post.caption}"');
-    } else {
-      print('$username sudah menyukai postingan ini sebelumnya.');
-    }
-  }
-
-  void checkStatus() {
-    print('Profil: $username | Bio: $bio');
-    print(
-      'Postingan: ${posts.length} | Postingan yang disukai: ${likedPosts.length}',
-    );
-  }
-}
-
-// Model untuk Postingan
-class Post {
-  String content;
-  String caption;
-  List<Comment> comments = [];
-  int likes = 0;
-
-  Post(this.content, this.caption);
-
-  void addComment(Comment comment) {
-    comments.add(comment);
-    print(
-      'Komentar baru ditambahkan oleh ${comment.username}: "${comment.text}"',
-    );
-  }
-
-  void likePost() {
-    likes++;
-    print('Postingan "$caption" mendapat $likes like(s)');
-  }
-}
-
-// Model untuk Komentar
-class Comment {
-  String text;
-  String username;
-
-  Comment(this.username, this.text);
-}
-
-// Sistem Utama (Simulasi Instagram)
 void main() {
   List<User> users = [];
   User? currentUser;
 
   while (true) {
-    print('\nPilih aksi:');
-    print('1. Login');
-    print('2. Register');
-    print('3. Keluar');
-
+    print('\nPilih aksi:\n1. Login\n2. Register\n3. Keluar');
     String? pilihan = stdin.readLineSync();
+
     if (pilihan == '1') {
       print('Masukkan username untuk login:');
       String? username = stdin.readLineSync();
 
-      currentUser = users.firstWhere(
-        (user) => user.username == username,
-        orElse: () => User('', ''),
-      );
-
-      if (currentUser.username == '') {
-        print('Username tidak ditemukan. Silakan coba lagi.');
-      } else {
+      try {
+        currentUser = users.firstWhere((user) => user.username == username);
         print('Berhasil login sebagai $username');
         break;
+      } catch (e) {
+        print('Username tidak ditemukan. Silakan coba lagi.');
       }
     } else if (pilihan == '2') {
       print('Masukkan username untuk register:');
       String? username = stdin.readLineSync();
-
       print('Masukkan bio Anda:');
       String? bio = stdin.readLineSync();
 
-      User newUser = User(username ?? '', bio ?? '');
-      users.add(newUser);
-
-      print('Berhasil register sebagai $username');
-      currentUser = newUser;
-      break;
+      if (username != null && bio != null) {
+        User newUser = User(username, bio);
+        users.add(newUser);
+        print('Berhasil register sebagai $username');
+        currentUser = newUser;
+        break;
+      } else {
+        print('Username atau bio tidak boleh kosong.');
+      }
     } else if (pilihan == '3') {
       print('Terima kasih telah menggunakan Instagram Simulasi!');
-      break;
+      return;
     } else {
       print('Pilihan tidak valid. Silakan coba lagi.');
     }
@@ -124,6 +60,7 @@ void main() {
     print('5. Keluar');
 
     String? pilihan = stdin.readLineSync();
+
     if (pilihan == '1') {
       print('Masukkan deskripsi postingan:');
       String? caption = stdin.readLineSync();
@@ -142,16 +79,9 @@ void main() {
         }
         String? indexInput = stdin.readLineSync();
         int? index = int.tryParse(indexInput ?? '');
+
         if (index != null && index > 0 && index <= currentUser.posts.length) {
-          // Perbaiki ini dengan mengembalikan user lain jika ada
-          User otherUser = users.firstWhere(
-            (user) => user != currentUser,
-            orElse:
-                () =>
-                    users
-                        .first, // Mengembalikan user pertama yang valid jika tidak ada user lain
-          );
-          otherUser.likePost(currentUser.posts[index - 1]);
+          currentUser.likePost(currentUser.posts[index - 1]);
         } else {
           print('Pilihan tidak valid.');
         }
@@ -166,7 +96,7 @@ void main() {
       break;
     } else if (pilihan == '5') {
       print('Terima kasih telah menggunakan Instagram Simulasi!');
-      break;
+      return;
     } else {
       print('Pilihan tidak valid. Silakan coba lagi.');
     }
